@@ -1,6 +1,7 @@
 {
   "name": "streamly",
   "version": "1.0.0",
+  "type": "module",
   "description": "Streamly is an application that allows users to watch movies together in real-time, providing a synchronized viewing experience.",
   "main": "server.mjs",
   "scripts": {
