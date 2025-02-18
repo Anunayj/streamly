@@ -10,7 +10,8 @@ const JoinRoom = () => {
 
   const createNewRoom = (e) => {
     e.preventDefault();
-    const id = uuidV4();
+    // const id = uuidV4();
+    const id = Math.random().toString(36).substring(2, 8).toUpperCase();
     setRoomId(id);
     toast.success("Created a new room");
   };
