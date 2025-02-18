@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Client from "../components/Client";
 import VideoPlayer from "../components/VideoPlayer";
-import ACTIONS from "../Actions";
+import ACTIONS from "../../shared/Actions";
 import { initSocket } from "../socket";
 import {
   Navigate,

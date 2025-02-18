@@ -1,11 +1,12 @@
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import ACTIONS from "./src/Actions.js";
+import ACTIONS from "./frontend/shared/Actions.js";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 
+const NODE_ENV = process.env.NODE_ENV || 'production';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
@@ -19,11 +20,17 @@ const io = new Server(server, {
   },
 });
 
-app.use(express.static(path.join(__dirname, "dist")));
+if(NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, "frontend", "dist")));
 
-app.use((req, res, next) => {
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
-});
+  app.use((req, res, next) => {
+    res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
+  });
+}else{
+  app.get("/", (req, res) => {
+    res.send("Server is running in development mode, please use frontend app port to interact with the server");
+  });
+}
 
 const userSocketMap = {};
 
