@@ -14,7 +14,7 @@ app.use(cors());
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*", // Allow all origins (for local testing)
+    origin: "*", // Allow all origins (for development)
     methods: ["GET", "POST"],
   },
 });
@@ -67,5 +67,5 @@ io.on("connection", (socket) => {
   });
 });
 
-const PORT = process.env.PORT || 5002;
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`Listening on ${PORT}`));

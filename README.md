@@ -1,8 +1,39 @@
-# React + Vite
+# Streamly
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Streamly is an application that allows users to watch movies together in real-time, providing a synchronized viewing experience.
 
-Currently, two official plugins are available:
+It was created by Anjali Garhwal and Anunay Jain.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## How to Run
+
+To get started with Streamly, follow these steps:
+
+1. **Install Dependencies**:
+    ```bash
+    npm install
+    ```
+
+2. **Start the Frontend Development Server**:
+    ```bash
+    npm run dev:front
+    ```
+
+3. **Start the Full Development Server**:
+    ```bash
+    npm run dev
+    ```
+
+4. **Build for Production**:
+    ```bash
+    npm run build
+    ```
+
+5. **Start the Production Server**:
+    ```bash
+    npm run server:prod
+    ```
+
+6. **Lint the Code**:
+    ```bash
+    npm run lint
+    ```
