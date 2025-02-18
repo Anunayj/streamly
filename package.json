@@ -5,10 +5,10 @@
   "description": "Streamly is an application that allows users to watch movies together in real-time, providing a synchronized viewing experience.",
   "main": "server.mjs",
   "scripts": {
-    "dev": "concurrently --kill-others \"cd ./frontend && VITE_REACT_APP_BACKEND_URL=http://localhost:3000 npm run dev\" \"NODE_ENV=development nodemon server.mjs\" ",
-    "build": "cd ./frontend && npm run build",
+    "dev": "concurrently --kill-others \"cross-env NODE_ENV=development nodemon server.mjs\" \"cross-env VITE_REACT_APP_BACKEND_URL=http://localhost:3000 npm --prefix frontend run dev\"",
+    "build": "npm run --prefix frontend build",
     "watch-server": "nodemon server.mjs",
-    "start": "npm run build && node server.mjs" 
+    "start": "npm run build && node server.mjs"
   },
   "repository": {
     "type": "git",
@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
     "nodemon": "^3.1.9"
   }
 }
