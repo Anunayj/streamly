@@ -17,6 +17,16 @@ const JoinRoom = () => {
   };
 
   const joinRoom = () => {
+    if (! /^[a-zA-Z0-9]{6}$/.test(roomId)) {
+      toast.error("Invalid Room ID");
+      return;
+    }
+
+    if(username.length < 3 || username.length > 20) {
+      toast.error("Username should be between 3 to 20 characters");
+      return;
+    }
+
     if (!roomId || !username) {
       toast.error("Please fill all the fields");
       return;

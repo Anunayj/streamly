@@ -1,8 +1,38 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const [currentState, setCurrentState] = useState("Sign Up");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
 
+  const handleLoginSignup = (e) => {
+    e.preventDefault();
+    if (currentState === "Sign Up") {
+      if (name.length < 3) {
+        toast.error("Name should be atleast 3 characters long");
+        return;
+      }
+      if(!/[a-zA-Z]+/.test(name)){
+        toast.error("Name should not contain numbers");
+        return;
+      }
+    }
+
+    if (password.length < 8){
+      toast.error("Password should be atleast 8 characters long");
+      return;
+    }
+
+    if (password !== confirm) {
+      toast.error("Password and confirm password must match");
+      return;
+    }
+
+  };
+  
   return (
     <div
       className="homePageWrapper min-h-screen flex flex-col items-center justify-center"
@@ -25,6 +55,7 @@ const Login = () => {
             type="text"
             className="w-full px-3 py-2 border border-gray-800"
             placeholder="Name"
+            onChange={(e) => setName(e.target.value)}
             required
           />
         )}
@@ -32,14 +63,25 @@ const Login = () => {
           type="email"
           className="w-full px-3 py-2 border border-gray-800"
           placeholder="Email"
+          onChange={(e) => setEmail(e.target.value)}
           required
         />
         <input
           type="password"
           className="w-full px-3 py-2 border border-gray-800"
           placeholder="Password"
+          onChange={(e) => setPassword(e.target.value)}
           required
         />
+
+        <input
+          type="password"
+          className="w-full px-3 py-2 border border-gray-800"
+          placeholder="Confirm Password"
+          onChange={(e) => setConfirm(e.target.value)}
+          required
+        />
+
         <div className="w-full flex justify-between text-sm mt-[-8px]">
           <p className="cursor-pointer">Forgot your password</p>
           {currentState === "Login" ? (
@@ -59,7 +101,7 @@ const Login = () => {
           )}
         </div>
           
-        <button className="bg-black text-white font-light px-8 py-2 mt-4">
+        <button className="bg-black text-white font-light px-8 py-2 mt-4" onSubmit={handleLoginSignup}>
           {currentState === "Login" ? "Sign In" : "Sign Up"}
         </button>
       </form>

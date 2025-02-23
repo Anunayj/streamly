@@ -21,12 +21,12 @@ const Navbar = () => {
             <p> Log In </p>
           </NavLink>
 
-          <NavLink
+          {/* <NavLink
             to="/premium"
             className=" text-white hover:text-red-400 transition duration-300 py-2"
           >
             <p>Premium</p>
-          </NavLink>
+          </NavLink> */}
 
           <NavLink
             to="/about"
@@ -42,12 +42,12 @@ const Navbar = () => {
             <p>Contact Us</p>
           </NavLink>
 
-          <NavLink
+          {/* <NavLink
             to="/learn-more"
             className=" bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300"
           >
             <p>Learn More</p>
-          </NavLink>
+          </NavLink> */}
         </ul>
       </nav>
     </header>

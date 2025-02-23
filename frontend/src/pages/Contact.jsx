@@ -41,7 +41,7 @@ const Contact = () => {
       </div>
       <div className="flex flex-wrap justify-center gap-10 mb-28">
         <button className="border border-black px-8 py-4 text-sm hover:bg-black hover:text-white transition-all duration-500">
-          <a href="#" target="blank">
+          <a href="https://anu.ninja" target="blank">
             Anunay Jain
           </a>
         </button>

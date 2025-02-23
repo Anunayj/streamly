@@ -10,7 +10,7 @@ const About = () => {
 
       <div className="my-10 mx-10 flex flex-col md:flex-row gap-16">
         <img
-          className="w-full md:max-w-[450px]"
+          className="w-full md:max-w-[450px] h-fit"
           src="../images/about.jpg"
           alt="About Us"
         />
