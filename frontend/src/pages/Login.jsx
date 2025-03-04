@@ -7,32 +7,61 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [nameError, setNameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmError, setConfirmError] = useState("");
+
+  const validateName = (value) => {
+    if (value.length < 3) {
+      setNameError("Name should be at least 3 characters long");
+    } else if (!/[a-zA-Z]+/.test(value)) {
+      setNameError("Name should not contain numbers");
+    } else {
+      setNameError("");
+    }
+  };
+
+  const validateEmail = (value) => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(value)) {
+      setEmailError("Please enter a valid email address");
+    } else {
+      setEmailError("");
+    }
+  };
+
+  const validatePassword = (value) => {
+    if (value.length < 8) {
+      setPasswordError("Password should be at least 8 characters long");
+    } else {
+      setPasswordError("");
+    }
+  };
+
+  const validateConfirm = (value) => {
+    if (value !== password) {
+      setConfirmError("Passwords do not match");
+    } else {
+      setConfirmError("");
+    }
+  };
 
   const handleLoginSignup = (e) => {
     e.preventDefault();
     if (currentState === "Sign Up") {
-      if (name.length < 3) {
-        toast.error("Name should be atleast 3 characters long");
+      validateName(name);
+      validateEmail(email);
+      validatePassword(password);
+      validateConfirm(confirm);
+
+      if (nameError || emailError || passwordError || confirmError) {
+        toast.error("Please fix the errors before submitting");
         return;
       }
-      if(!/[a-zA-Z]+/.test(name)){
-        toast.error("Name should not contain numbers");
-        return;
-      }
     }
-
-    if (password.length < 8){
-      toast.error("Password should be atleast 8 characters long");
-      return;
-    }
-
-    if (password !== confirm) {
-      toast.error("Password and confirm password must match");
-      return;
-    }
-
   };
-  
+
   return (
     <div
       className="homePageWrapper min-h-screen flex flex-col items-center justify-center"
@@ -51,37 +80,71 @@ const Login = () => {
         {currentState === "Login" ? (
           ""
         ) : (
+          <div className="w-full">
+            <input
+              type="text"
+              className={`w-full px-3 py-2 border ${
+                nameError ? "border-red-500" : "border-gray-800"
+              }`}
+              placeholder="Name"
+              onChange={(e) => {
+                setName(e.target.value);
+                validateName(e.target.value);
+              }}
+              required
+            />
+            {nameError && <p className="text-red-500 text-sm">{nameError}</p>}
+          </div>
+        )}
+        <div className="w-full">
           <input
-            type="text"
-            className="w-full px-3 py-2 border border-gray-800"
-            placeholder="Name"
-            onChange={(e) => setName(e.target.value)}
+            type="email"
+            className={`w-full px-3 py-2 border ${
+              emailError ? "border-red-500" : "border-gray-800"
+            }`}
+            placeholder="Email"
+            onChange={(e) => {
+              setEmail(e.target.value);
+              validateEmail(e.target.value);
+            }}
             required
           />
-        )}
-        <input
-          type="email"
-          className="w-full px-3 py-2 border border-gray-800"
-          placeholder="Email"
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          className="w-full px-3 py-2 border border-gray-800"
-          placeholder="Password"
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-
-        <input
-          type="password"
-          className="w-full px-3 py-2 border border-gray-800"
-          placeholder="Confirm Password"
-          onChange={(e) => setConfirm(e.target.value)}
-          required
-        />
-
+          {emailError && <p className="text-red-500 text-sm">{emailError}</p>}
+        </div>
+        <div className="w-full">
+          <input
+            type="password"
+            className={`w-full px-3 py-2 border ${
+              passwordError ? "border-red-500" : "border-gray-800"
+            }`}
+            placeholder="Password"
+            onChange={(e) => {
+              setPassword(e.target.value);
+              validatePassword(e.target.value);
+            }}
+            required
+          />
+          {passwordError && (
+            <p className="text-red-500 text-sm">{passwordError}</p>
+          )}
+        </div>
+        <div className="w-full">
+          <input
+            type="password"
+            className={`w-full px-3 py-2 border ${
+              confirmError ? "border-red-500" : "border-gray-800"
+            }`}
+            placeholder="Confirm Password"
+            onChange={(e) => {
+              setConfirm(e.target.value);
+              validateConfirm(e.target.value);
+            }}
+            required
+          />
+          {confirmError && (
+            <p className="text-red-500 text-sm">{confirmError}</p>
+          )}
+        </div>
         <div className="w-full flex justify-between text-sm mt-[-8px]">
           <p className="cursor-pointer">Forgot your password</p>
           {currentState === "Login" ? (
@@ -100,8 +163,10 @@ const Login = () => {
             </p>
           )}
         </div>
-          
-        <button className="bg-black text-white font-light px-8 py-2 mt-4" onSubmit={handleLoginSignup}>
+        <button
+          className="bg-black text-white font-light px-8 py-2 mt-4"
+          onSubmit={handleLoginSignup}
+        >
           {currentState === "Login" ? "Sign In" : "Sign Up"}
         </button>
       </form>

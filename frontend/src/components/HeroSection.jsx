@@ -2,7 +2,7 @@ import React from "react";
 
 const HeroSection = () => {
   return (
-    <section className="mainWrap text-center py-10 px-6">
+    <section className="mainWrap text-center py-10 px-6  pt-[70px]">
       <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
         Watch Movies & Shows Together, Anytime!
       </h1>

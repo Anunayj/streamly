@@ -10,7 +10,7 @@ const Contact = () => {
 
       <div className="mx-10 my-10 flex flex-col justify-center md:flex-row gap-10 mb-28">
         <img
-          className="w-full md:max-w-[450px]"
+          className="w-full md:max-w-[450px]  h-fit"
           src="../images/contact.jpeg"
           alt=""
         />
