@@ -114,12 +114,27 @@ const RoomPage = () => {
         addLocalEvents();
       };
 
+      let toastCooldown = false;
+      function showToast(message) {
+        if (toastCooldown) return;
+        toast.info(message);
+        toastCooldown = true;
+        setTimeout(() => { toastCooldown = false; }, 1000);
+      }
+
       socketRef.current.on(ACTIONS.PLAY, async ({ currentTime, username }) => {
         if (username === location.state?.username) return;
         removeLocalEvents();
         video.currentTime = currentTime;
-        video.play();
-        toast.info(`${username} played the video.`);
+        if (navigator.getAutoplayPolicy(video) === "allowed") {
+          video.play();
+        }else if(navigator.getAutoplayPolicy(video) === "allowed-muted") {
+          video.muted = true;
+          video.play();
+        }else{
+          showToast(`Autoplay is disallowed, interact with video once.`);
+        }
+        showToast(`${username} played the video.`);
         await awaitEvents();
       });
 
@@ -128,7 +143,7 @@ const RoomPage = () => {
         removeLocalEvents();
         video.currentTime = currentTime;
         video.pause();
-        toast.info(`${username} paused the video.`);
+        showToast(`${username} paused the video.`);
         await awaitEvents();
       });
 
@@ -136,13 +151,10 @@ const RoomPage = () => {
         if (username === location.state?.username) return;
         removeLocalEvents();
         video.currentTime = currentTime;
-        toast.info(`${username} seeked the video.`);
+        showToast(`${username} seeked the video.`);
         await awaitEvents();
       });
-
-
     };
-
 
     init();
     return () => {
