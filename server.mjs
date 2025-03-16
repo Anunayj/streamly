@@ -61,6 +61,18 @@ io.on("connection", (socket) => {
     });
   });
 
+  socket.on(ACTIONS.PLAY, ({ roomId, currentTime }) => {
+    socket.in(roomId).emit(ACTIONS.PLAY, { currentTime });
+  });
+
+  socket.on(ACTIONS.PAUSE, ({ roomId, currentTime }) => {
+    socket.in(roomId).emit(ACTIONS.PAUSE, { currentTime });
+  });
+
+  socket.on(ACTIONS.SEEK, ({ roomId, currentTime }) => {
+    socket.in(roomId).emit(ACTIONS.SEEK, { currentTime });
+  });
+
   socket.on("disconnecting", () => {
     const rooms = [...socket.rooms];
     rooms.forEach((roomId) => {

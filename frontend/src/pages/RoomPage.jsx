@@ -16,6 +16,7 @@ const RoomPage = () => {
   const location = useLocation();
   const { roomId } = useParams();
   const [clients, setClients] = useState([]);
+  const [videoSrc, setVideoSrc] = useState("/videos/placeholder.webm");
   const reactNavigator = useNavigate();
 
   useEffect(() => {
@@ -79,6 +80,14 @@ const RoomPage = () => {
     reactNavigator("/");
   }
 
+  function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const fileURL = URL.createObjectURL(file);
+      setVideoSrc(fileURL);
+    }
+  }
+
   if (!location.state) {
     return <Navigate to="/" />;
   }
@@ -94,7 +103,6 @@ const RoomPage = () => {
       }}
     >
       <div className="flex flex-1 overflow-hidden bg-grey bg-opacity-10 backdrop-blur-md">
-        {/* Sidebar */}
         <div className="flex flex-col p-4 sm:max-w-60 text-white w-64 border-r border-white">
           <div className=" mt-20 flex-1">
             <div className="border-b border-gray-200 pb-2">
@@ -119,11 +127,23 @@ const RoomPage = () => {
           >
             Leave Room
           </button>
+          <button
+            className="cursor-pointer btn bg-blue-500 text-white py-2 px-4 rounded mt-2"
+            onClick={() => document.getElementById('fileInput').click()}
+          >
+            Browse
+          </button>
+          <input
+            type="file"
+            id="fileInput"
+            style={{ display: 'none' }}
+            onChange={(e) => handleFileSelect(e)}
+          />
         </div>
 
         {/* Video Player Section */}
         <div className="flex-1">
-          <VideoPlayer />
+          <VideoPlayer videoSrc={videoSrc} socketRef={socketRef} />
         </div>
       </div>
     </div>
