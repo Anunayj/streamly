@@ -61,16 +61,28 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on(ACTIONS.PLAY, ({ roomId, currentTime }) => {
-    socket.in(roomId).emit(ACTIONS.PLAY, { currentTime });
-  });
+  socket.on(ACTIONS.PLAY, ({ roomId, currentTime, username }) => {
+      socket.join(roomId);
+      const clients = getAllConnectedClients(roomId);
+      clients.forEach(({ socketId }) => {
+        io.to(socketId).emit(ACTIONS.PLAY, { currentTime, username });
+      });
+    });
 
-  socket.on(ACTIONS.PAUSE, ({ roomId, currentTime }) => {
-    socket.in(roomId).emit(ACTIONS.PAUSE, { currentTime });
-  });
+    socket.on(ACTIONS.PAUSE, ({ roomId, currentTime, username }) => {
+      socket.join(roomId);
+      const clients = getAllConnectedClients(roomId);
+      clients.forEach(({ socketId }) => {
+        io.to(socketId).emit(ACTIONS.PAUSE, { currentTime, username });
+      });
+    });
 
-  socket.on(ACTIONS.SEEK, ({ roomId, currentTime }) => {
-    socket.in(roomId).emit(ACTIONS.SEEK, { currentTime });
+    socket.on(ACTIONS.SEEK, ({ roomId, currentTime, username }) => {
+      socket.join(roomId);
+      const clients = getAllConnectedClients(roomId);
+      clients.forEach(({ socketId }) => {
+        io.to(socketId).emit(ACTIONS.SEEK, { currentTime, username });
+      });
   });
 
   socket.on("disconnecting", () => {

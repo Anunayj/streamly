@@ -3,6 +3,7 @@ import Client from "../components/Client";
 import VideoPlayer from "../components/VideoPlayer";
 import ACTIONS from "../../shared/Actions";
 import { initSocket } from "../socket";
+
 import {
   Navigate,
   useLocation,
@@ -11,8 +12,14 @@ import {
 } from "react-router-dom";
 import { toast } from "react-toastify";
 
+async function wait(element, targetevent) {
+  // eat the event.
+  return new Promise(resolve =>  element.addEventListener(targetevent, () => resolve()));
+}
+
 const RoomPage = () => {
   const socketRef = useRef(null);
+  const playerRef = useRef(null);
   const location = useLocation();
   const { roomId } = useParams();
   const [clients, setClients] = useState([]);
@@ -54,7 +61,89 @@ const RoomPage = () => {
           return prev.filter((client) => client.socketId !== socketId);
         });
       });
+
+      const video = playerRef.current;
+      
+      if(!video) {
+        console.log("WTF? Where the video at?");
+        return;
+      };
+
+      // Socket listeners for playback events
+      // Local handlers
+      const onLocalPlay = () => {
+        socketRef.current.emit(ACTIONS.PLAY, {
+          currentTime: video.currentTime,
+          username: location.state?.username,
+        });
+      };
+      const onLocalPause = () => {
+        socketRef.current.emit(ACTIONS.PAUSE, {
+          currentTime: video.currentTime,
+          username: location.state?.username,
+        });
+      };
+      const onLocalSeek = () => {
+        socketRef.current.emit(ACTIONS.SEEK, {
+          currentTime: video.currentTime,
+          username: location.state?.username,
+        });
+      };
+
+      // Attach local events
+      video.addEventListener("play", onLocalPlay);
+      video.addEventListener("pause", onLocalPause);
+      video.addEventListener("seeked", onLocalSeek);
+
+      // Remote handlers
+      const removeLocalEvents = () => {
+        video.removeEventListener("play", onLocalPlay);
+        video.removeEventListener("pause", onLocalPause);
+        video.removeEventListener("seeked", onLocalSeek);
+      };
+      const addLocalEvents = () => {
+        video.addEventListener("play", onLocalPlay);
+        video.addEventListener("pause", onLocalPause);
+        video.addEventListener("seeked", onLocalSeek);
+      };
+
+      const awaitEvents = async () => {
+        await wait(video, 'play');
+        await wait(video, 'pause');
+        await wait(video, 'seeked');
+        addLocalEvents();
+      };
+
+      socketRef.current.on(ACTIONS.PLAY, async ({ currentTime, username }) => {
+        if (username === location.state?.username) return;
+        removeLocalEvents();
+        video.currentTime = currentTime;
+        video.play();
+        toast.info(`${username} played the video.`);
+        await awaitEvents();
+      });
+
+      socketRef.current.on(ACTIONS.PAUSE, async ({ currentTime, username }) => {
+        if (username === location.state?.username) return;
+        removeLocalEvents();
+        video.currentTime = currentTime;
+        video.pause();
+        toast.info(`${username} paused the video.`);
+        await awaitEvents();
+      });
+
+      socketRef.current.on(ACTIONS.SEEK, async ({ currentTime, username }) => {
+        if (username === location.state?.username) return;
+        removeLocalEvents();
+        video.currentTime = currentTime;
+        toast.info(`${username} seeked the video.`);
+        await awaitEvents();
+      });
+
+
     };
+
+
     init();
     return () => {
       if (socketRef.current) {
@@ -62,6 +151,9 @@ const RoomPage = () => {
         socketRef.current.disconnect();
         socketRef.current.off(ACTIONS.JOINED);
         socketRef.current.off(ACTIONS.DISCONNECTED);
+        socketRef.current.off(ACTIONS.PLAY);
+        socketRef.current.off(ACTIONS.PAUSE);
+        socketRef.current.off(ACTIONS.SEEK);
       }
     };
   }, []);
@@ -143,7 +235,7 @@ const RoomPage = () => {
 
         {/* Video Player Section */}
         <div className="flex-1">
-          <VideoPlayer videoSrc={videoSrc} socketRef={socketRef} />
+          <VideoPlayer videoSrc={videoSrc} ref={playerRef}/>
         </div>
       </div>
     </div>

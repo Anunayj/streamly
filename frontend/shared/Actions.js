@@ -5,7 +5,8 @@ const ACTIONS = {
   LEAVE: "leave",
   SEEK: "seek",
   PLAY: "play",
-  PAUSE: "pause"
+  PAUSE: "pause",
+  SYNC: "sync",
 };
 
 export default ACTIONS;
