@@ -14,7 +14,9 @@ import { toast } from "react-toastify";
 
 async function wait(element, targetevent) {
   // eat the event.
-  return new Promise(resolve =>  element.addEventListener(targetevent, () => resolve()));
+  return new Promise((resolve) =>
+    element.addEventListener(targetevent, () => resolve())
+  );
 }
 
 const RoomPage = () => {
@@ -24,6 +26,7 @@ const RoomPage = () => {
   const { roomId } = useParams();
   const [clients, setClients] = useState([]);
   const [videoSrc, setVideoSrc] = useState("/videos/placeholder.webm");
+  const [sidebarVisible, setSidebarVisible] = useState(true);
   const reactNavigator = useNavigate();
 
   useEffect(() => {
@@ -63,11 +66,11 @@ const RoomPage = () => {
       });
 
       const video = playerRef.current;
-      
-      if(!video) {
+
+      if (!video) {
         console.log("WTF? Where the video at?");
         return;
-      };
+      }
 
       // Socket listeners for playback events
       // Local handlers
@@ -108,9 +111,9 @@ const RoomPage = () => {
       };
 
       const awaitEvents = async () => {
-        await wait(video, 'play');
-        await wait(video, 'pause');
-        await wait(video, 'seeked');
+        await wait(video, "play");
+        await wait(video, "pause");
+        await wait(video, "seeked");
         addLocalEvents();
       };
 
@@ -119,7 +122,9 @@ const RoomPage = () => {
         if (toastCooldown) return;
         toast.info(message);
         toastCooldown = true;
-        setTimeout(() => { toastCooldown = false; }, 1000);
+        setTimeout(() => {
+          toastCooldown = false;
+        }, 1000);
       }
 
       socketRef.current.on(ACTIONS.PLAY, async ({ currentTime, username }) => {
@@ -128,10 +133,10 @@ const RoomPage = () => {
         video.currentTime = currentTime;
         if (navigator.getAutoplayPolicy(video) === "allowed") {
           video.play();
-        }else if(navigator.getAutoplayPolicy(video) === "allowed-muted") {
+        } else if (navigator.getAutoplayPolicy(video) === "allowed-muted") {
           video.muted = true;
           video.play();
-        }else{
+        } else {
           showToast(`Autoplay is disallowed, interact with video once.`);
         }
         showToast(`${username} played the video.`);
@@ -197,28 +202,24 @@ const RoomPage = () => {
   }
 
   return (
-    <div
-      className="flex flex-col h-screen min-h-screen "
-      style={{
-        backgroundImage: "url('../images/room-back.jpg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-      }}
-    >
-      <div className="flex flex-1 overflow-hidden bg-grey bg-opacity-10 backdrop-blur-md">
-        <div className="flex flex-col p-4 sm:max-w-60 text-white w-64 border-r border-white">
-          <div className=" mt-20 flex-1">
-            <div className="border-b border-gray-200 pb-2">
-              <div className="text-2xl font-bold text-white">Connected</div>
-            </div>
+    <div className="flex flex-col h-screen min-h-screen bg-black">
+      // {/* Sidebar */}
+      <div
+        className={`fixed top-5 left-0 p-2 h-full overflow-hidden bg-grey bg-opacity-10 backdrop-blur-md w-55 text-white flex flex-col z-50 transition-all duration-300 ${
+          sidebarVisible ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="border-b border-gray-200 pb-2">
+          <div className="text-2xl font-bold ">Connected</div>
+        </div>
 
-            <div className="flex flex-wrap gap-5">
-              {clients.map((client) => (
-                <Client key={client.socketId} username={client.username} />
-              ))}
-            </div>
-          </div>
+        <div className="flex-grow overflow-auto mt-2">
+          {clients.map((client) => (
+            <Client key={client.socketId} username={client.username} />
+          ))}
+        </div>
+
+        <div className="flex flex-col gap-2 mt-4 pb-10">
           <button
             className="cursor-pointer btn bg-amber-100 text-black py-2 px-4 rounded mt-4"
             onClick={copyRoomId}
@@ -233,23 +234,32 @@ const RoomPage = () => {
           </button>
           <button
             className="cursor-pointer btn bg-blue-500 text-white py-2 px-4 rounded mt-2"
-            onClick={() => document.getElementById('fileInput').click()}
+            onClick={() => document.getElementById("fileInput").click()}
           >
             Browse
           </button>
           <input
             type="file"
             id="fileInput"
-            style={{ display: 'none' }}
+            style={{ display: "none" }}
             onChange={(e) => handleFileSelect(e)}
           />
         </div>
-
-        {/* Video Player Section */}
-        <div className="flex-1">
-          <VideoPlayer videoSrc={videoSrc} ref={playerRef}/>
-        </div>
       </div>
+      {/* Video Player Section */}
+      <div className="flex-1 relative">
+        {/* Toggle Sidebar Button */}
+        <button
+          className="absolute top-12 right-2 z-50 bg-white text-black p-2 rounded"
+          onClick={() => setSidebarVisible(!sidebarVisible)}
+        >
+          {sidebarVisible ? "Hide Sidebar" : "Show Sidebar"}
+        </button>
+
+        {/* Video Player */}
+        <VideoPlayer videoSrc={videoSrc} ref={playerRef} />
+      </div>
+      //{" "}
     </div>
   );
 };
