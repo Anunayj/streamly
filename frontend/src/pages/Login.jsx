@@ -47,8 +47,11 @@ const Login = () => {
     }
   };
 
-  const handleLoginSignup = (e) => {
+  const handleLoginSignup = async (e) => {
     e.preventDefault();
+    console.log("Login/Signup clicked");
+    const baseUrl = import.meta.env.VITE_REACT_APP_BACKEND_URL;
+
     if (currentState === "Sign Up") {
       validateName(name);
       validateEmail(email);
@@ -58,6 +61,51 @@ const Login = () => {
       if (nameError || emailError || passwordError || confirmError) {
         toast.error("Please fix the errors before submitting");
         return;
+      }
+
+      try {
+        const response = await fetch(`${baseUrl}/api/signup`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username: name, email, password }),
+        });
+
+        if (response.ok) {
+          toast.success("Sign up successful! Please log in.");
+          setCurrentState("Login");
+          setEmail(email);
+          setPassword("");
+        } else {
+          const errorData = await response.json();
+          toast.error(errorData.error || "Sign up failed.");
+        }
+      } catch (error) {
+        toast.error("An error occurred during sign up.");
+      }
+    } else {
+      try {
+        const response = await fetch(`${baseUrl}/api/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          localStorage.setItem('authToken', data.token);
+          localStorage.setItem('username', data.username);
+          toast.success("Login successful!");
+          window.location.href = "/";
+        } else {
+          const errorData = await response.json();
+          toast.error(errorData.error || "Login failed.");
+        }
+      } catch (error) {
+        toast.error("An error occurred during login.");
       }
     }
   };
@@ -97,6 +145,7 @@ const Login = () => {
           </div>
         )}
         <div className="w-full">
+          <div className="w-full">
           <input
             type="email"
             className={`w-full px-3 py-2 border ${
@@ -110,6 +159,7 @@ const Login = () => {
             required
           />
           {emailError && <p className="text-red-500 text-sm">{emailError}</p>}
+        </div>
         </div>
         <div className="w-full">
           <input
@@ -128,23 +178,25 @@ const Login = () => {
             <p className="text-red-500 text-sm">{passwordError}</p>
           )}
         </div>
-        <div className="w-full">
-          <input
-            type="password"
-            className={`w-full px-3 py-2 border ${
-              confirmError ? "border-red-500" : "border-gray-800"
-            }`}
-            placeholder="Confirm Password"
-            onChange={(e) => {
-              setConfirm(e.target.value);
-              validateConfirm(e.target.value);
-            }}
-            required
-          />
-          {confirmError && (
-            <p className="text-red-500 text-sm">{confirmError}</p>
-          )}
-        </div>
+        {currentState === "Sign Up" && (
+          <div className="w-full">
+            <input
+              type="password"
+              className={`w-full px-3 py-2 border ${
+                confirmError ? "border-red-500" : "border-gray-800"
+              }`}
+              placeholder="Confirm Password"
+              onChange={(e) => {
+                setConfirm(e.target.value);
+                validateConfirm(e.target.value);
+              }}
+              required
+            />
+            {confirmError && (
+              <p className="text-red-500 text-sm">{confirmError}</p>
+            )}
+          </div>
+        )}
         <div className="w-full flex justify-between text-sm mt-[-8px]">
           <p className="cursor-pointer">Forgot your password</p>
           {currentState === "Login" ? (
@@ -165,7 +217,7 @@ const Login = () => {
         </div>
         <button
           className="bg-black text-white font-light px-8 py-2 mt-4"
-          onSubmit={handleLoginSignup}
+          onClick={handleLoginSignup}
         >
           {currentState === "Login" ? "Sign In" : "Sign Up"}
         </button>

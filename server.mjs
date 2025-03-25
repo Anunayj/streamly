@@ -16,6 +16,68 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 app.use(cors());
 
+import jwt from "jsonwebtoken";
+import bodyParser from "body-parser";
+
+const JWT_SECRET = process.env.JWT_SECRET || "ABCDstreamly";
+
+app.use(bodyParser.json());
+
+app.post("/api/signup", async (req, res) => {
+  const { username, email, password } = req.body;
+  try {
+    await db.addUser(username, email, password);
+    res.status(201).json({ message: "User signed up successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to sign up user" });
+  }
+});
+
+import cookieParser from "cookie-parser";
+app.use(cookieParser());
+
+app.post("/api/login", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const username = await db.verifyUser(email, password);
+    if (username) {
+      const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: "1h" });
+      res.cookie("authToken", token, {
+        httpOnly: true,
+        secure: NODE_ENV === "production",
+        maxAge: 3600000, // 1 hour
+      });
+      res.status(200).json({ message: "Login successful", username });
+    } else {
+      res.status(401).json({ error: "Invalid email or password" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Failed to log in user" });
+  }
+});
+
+app.get("/api/userinfo", async (req, res) => {
+  const token = req.cookies.authToken;
+  if (!token) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const email = decoded.email;
+    const [results] = await db.sequelize.query(
+      "SELECT username FROM users WHERE email = ?",
+      { replacements: [email] }
+    );
+    if (results.length > 0) {
+      res.status(200).json({ username: results[0].username });
+    } else {
+      res.status(404).json({ error: "User not found" });
+    }
+  } catch (error) {
+    res.status(401).json({ error: "Invalid token" });
+  }
+});
+
 const server = createServer(app);
 const io = new Server(server, {
   cors: {

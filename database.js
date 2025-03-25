@@ -141,18 +141,18 @@ class Database {
     }
   }
 
-  async verifyUser(username, password) {
+  async verifyUser(email, password) {
     try {
       const [results] = await this.sequelize.query(
-        'SELECT password_hash FROM users WHERE username = ?',
+        'SELECT username, password_hash FROM users WHERE email = ?',
         {
-          replacements: [username],
+          replacements: [email],
         }
       );
       if (results.length > 0) {
         const passwordHash = results[0].password_hash;
         const isMatch = await bcrypt.compare(password, passwordHash);
-        return isMatch;
+        return isMatch ? results[0].username : false;
       } else {
         return false;
       }

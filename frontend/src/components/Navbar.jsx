@@ -1,8 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 
 const Navbar = () => {
   const [visible, setVisible] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
+
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    const storedUsername = localStorage.getItem("username");
+    if (token) {
+      setIsLoggedIn(true);
+      setUsername(storedUsername || "");
+    } else {
+      setIsLoggedIn(false);
+      setUsername("");
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("username");
+    setIsLoggedIn(false);
+    setUsername("");
+    window.location.reload();
+  };
 
   return (
     <header className="bg-black bg-opacity-80 w-full fixed top-0 left-0 py-4 z-50">
@@ -12,15 +34,29 @@ const Navbar = () => {
           <NavLink to="/" className="text-white hover:text-red-400 py-2">
             Home
           </NavLink>
-          <NavLink to="/login" className="text-white hover:text-red-400 py-2">
-            Log In
-          </NavLink>
-          <NavLink to="/about" className="text-white hover:text-red-400 py-2">
-            About
-          </NavLink>
-          <NavLink to="/contact" className="text-white hover:text-red-400 py-2">
-            Contact Us
-          </NavLink>
+          {isLoggedIn ? (
+            <>
+              <span className="text-white py-2">Hi {username}</span>
+              <NavLink to="/premium" className="text-white hover:text-red-400 py-2">
+                Premium
+              </NavLink>
+              <button onClick={handleLogout} className="text-white hover:text-red-400 py-2">
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <NavLink to="/login" className="text-white hover:text-red-400 py-2">
+                Log In
+              </NavLink>
+              <NavLink to="/about" className="text-white hover:text-red-400 py-2">
+                About
+              </NavLink>
+              <NavLink to="/contact" className="text-white hover:text-red-400 py-2">
+                Contact Us
+              </NavLink>
+            </>
+          )}
         </ul>
 
         {/* Mobile Menu Icon */}
@@ -57,27 +93,51 @@ const Navbar = () => {
           >
             Home
           </NavLink>
-          <NavLink
-            onClick={() => setVisible(false)}
-            className="py-2 pl-6 border hover:text-red-400"
-            to="/login"
-          >
-            Log In
-          </NavLink>
-          <NavLink
-            onClick={() => setVisible(false)}
-            className="py-2 pl-6 border hover:text-red-400"
-            to="/about"
-          >
-            About
-          </NavLink>
-          <NavLink
-            onClick={() => setVisible(false)}
-            className="py-2 pl-6 border hover:text-red-400"
-            to="/contact"
-          >
-            Contact Us
-          </NavLink>
+          {isLoggedIn ? (
+            <>
+              <span className="py-2 pl-6 border text-white">Hi {username}</span>
+              <NavLink
+                onClick={() => setVisible(false)}
+                className="py-2 pl-6 border hover:text-red-400"
+                to="/premium"
+              >
+                Premium
+              </NavLink>
+              <button
+                onClick={() => {
+                  setVisible(false);
+                  handleLogout();
+                }}
+                className="py-2 pl-6 border hover:text-red-400 text-left"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <NavLink
+                onClick={() => setVisible(false)}
+                className="py-2 pl-6 border hover:text-red-400"
+                to="/login"
+              >
+                Log In
+              </NavLink>
+              <NavLink
+                onClick={() => setVisible(false)}
+                className="py-2 pl-6 border hover:text-red-400"
+                to="/about"
+              >
+                About
+              </NavLink>
+              <NavLink
+                onClick={() => setVisible(false)}
+                className="py-2 pl-6 border hover:text-red-400"
+                to="/contact"
+              >
+                Contact Us
+              </NavLink>
+            </>
+          )}
         </div>
       </div>
     </header>

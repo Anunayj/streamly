@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 const JoinRoom = () => {
   const navigate = useNavigate();
   const [roomId, setRoomId] = useState("");
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState(localStorage.getItem("username") || "");
 
   const createNewRoom = (e) => {
     e.preventDefault();
