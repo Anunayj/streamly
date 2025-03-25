@@ -2,6 +2,10 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import ACTIONS from "./frontend/shared/Actions.js";
+import Database from "./database.js";
+
+const db = Database.getInstance();
+await db.connect();
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -100,3 +104,9 @@ io.on("connection", (socket) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`Listening on ${PORT}`));
+
+process.on('SIGINT', async () => {
+  console.log("Closing database connection...");
+  await db.close();
+  process.exit(0);
+});

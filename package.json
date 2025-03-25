@@ -21,8 +21,11 @@
   },
   "homepage": "https://github.com/Anunayj/streamly#readme",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "express": "^4.21.2",
-    "socket.io": "^4.8.1"
+    "sequelize": "^6.37.6",
+    "socket.io": "^4.8.1",
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
